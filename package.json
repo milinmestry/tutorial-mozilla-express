@@ -1,0 +1,32 @@
+{
+  "name": "tutorial-mozilla-express",
+  "version": "1.0.0",
+  "description": "My first tutorial for learning Express.js framework of Node.js ecosystem.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/milinmestry/tutorial-mozilla-express.git"
+  },
+  "keywords": [
+    "mozilla",
+    "tutorial",
+    "expressjs",
+    "nodejs",
+    "milinmestry"
+  ],
+  "author": "Milin Mestry",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/milinmestry/tutorial-mozilla-express/issues"
+  },
+  "homepage": "https://github.com/milinmestry/tutorial-mozilla-express#readme",
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.5.0"
+  }
+}

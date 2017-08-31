@@ -8,12 +8,19 @@ var GenreSchema = Schema(
 );
 
 
-// Virtual for Author's URL
+// Virtual for Genre URL
 GenreSchema
-.virtual('url')
-.get(function () {
-  return '/catalog/genre/' + this._id;
-});
+  .virtual('url')
+  .get(function () {
+    return '/catalog/genre/' + this._id;
+  });
+
+// Virtual for Genre List
+GenreSchema
+  .virtual('list_url')
+  .get(function () {
+    return '/catalog/genres';
+  });
 
 // export model
 module.exports = mongoose.model('Genre', GenreSchema);

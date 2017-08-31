@@ -1,4 +1,9 @@
 var Author = require('../models/author');
+var Book = require('../models/book');
+
+var async = require('async');
+var mongoose = require('mongoose');
+
 
 // Display list of all authors
 exports.author_list = function(req, res, next) {
@@ -14,8 +19,26 @@ exports.author_list = function(req, res, next) {
 };
 
 // Display detail page for a specific author
-exports.author_detail = function(req, res) {
-  res.send('NOT IMPLEMENTED: author detail ' + req.params.id);
+exports.author_detail = function(req, res, next) {
+  var id = mongoose.Types.ObjectId(req.params.id.trim());
+
+  async.parallel({
+    author: function(callback) {
+      Author.findById(id).exec(callback);
+    },
+    authors_books: function(callback) {
+      Book.find({'author': id}, 'title summary').exec(callback);
+    }
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
+
+    // Render template
+    res.render('author_detail', {title: 'Author Detail', author: results.author
+      , author_books: results.authors_books}
+    );
+  });
 };
 
 // Display author create form on GET

@@ -40,5 +40,23 @@ AuthorSchema
     return this.date_of_death ? moment(this.date_of_death).format('MMMM Do, YYYY') : 'N.A.';
   });
 
+// Virtual for Author's lifespan
+AuthorSchema
+  .virtual('lifespan')
+  .get(function () {
+    var dob = this.date_of_birth ? moment(this.date_of_birth).format('MMMM Do, YYYY') : null;
+    var dod = this.date_of_death ? moment(this.date_of_death).format('MMMM Do, YYYY') : null;
+
+    if (dob === null && dod === null) {
+      return '';
+    } else {
+      if (dod === null) {
+        return '(' + dob + ')';
+      } else {
+        return '(' + dob + ' - ' + dod + ')';
+      }
+    }
+  });
+
 // export model
 module.exports = mongoose.model('Author', AuthorSchema);

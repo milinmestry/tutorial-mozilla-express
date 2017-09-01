@@ -26,6 +26,13 @@ AuthorSchema
     return '/catalog/author/' + this._id;
   });
 
+// Virtual for Author's URL
+AuthorSchema
+  .virtual('url_list')
+  .get(function () {
+    return '/catalog/authors';
+  });
+
 // Virtual for Author's date_of_death
 AuthorSchema
   .virtual('date_of_birth_formatted')

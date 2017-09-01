@@ -12,10 +12,17 @@ var BookSchema = Schema(
 
 // Virtual book url
 BookSchema
-.virtual('url')
-.get(function () {
-  return '/catalog/book/' + this._id;
-});
+  .virtual('url')
+  .get(function () {
+    return '/catalog/book/' + this._id;
+  });
+
+// Virtual book url list
+BookSchema
+  .virtual('url_list')
+  .get(function () {
+    return '/catalog/books';
+  });
 
 // export model
 module.exports = mongoose.model('Book', BookSchema);

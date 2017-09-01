@@ -67,13 +67,84 @@ exports.book_detail = function(req, res, next) {
 };
 
 // Display book create form on GET
-exports.book_create_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book create GET');
+exports.book_create_get = function(req, res, next) {
+  // Get all authors and genres which is required for a book
+  async.parallel({
+    authors: function(callback) {
+      Author.find(callback);
+    },
+    genres: function(callback) {
+      Genre.find(callback);
+    },
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.render('book_form', {title: 'Create Book', authors: results.authors
+      , genres: results.genres});
+  });
 };
 
 // Handle book create on POST
-exports.book_create_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book create POST');
+exports.book_create_post = function(req, res, next) {
+  req.checkBody('title', 'Book Title is required.').notEmpty();
+  req.checkBody('author', 'Book Author is required.').notEmpty();
+  req.checkBody('summary', 'Book Summary is required.').notEmpty();
+  req.checkBody('isbn', 'Book ISBN is required.').notEmpty();
+
+  req.sanitize('title').escape();
+  req.sanitize('title').trim();
+  req.sanitize('author').escape();
+  req.sanitize('author').trim();
+  req.sanitize('summary').escape();
+  req.sanitize('summary').trim();
+  req.sanitize('isbn').escape();
+  req.sanitize('isbn').trim();
+  req.sanitize('genre').escape();
+
+  var book = new Book({
+    title: req.body.title,
+    author: req.body.author,
+    summary: req.body.summary,
+    isbn: req.body.isbn,
+    genre: (typeof req.body.genre === 'undefined') ? [] : req.body.genre.split(','),
+  });
+
+  console.log('Book: ' + book);
+
+  var errors = req.validationErrors();
+  if (errors) {
+    async.parallel({
+      authors: function(callback) {
+        Author.find(callback);
+      },
+      genres: function(callback) {
+        Genre.find(callback);
+      },
+    }, function(err, results) {
+      if (err) {
+        return next(err);
+      }
+      // Mark our selected genres as checked
+      for (var i = 0; i < results.generes.length; i++) {
+        if (book.generes.indexOf(results.generes[i]._id > -1)) {
+          //Current genre is selected. Set "checked" flag.
+          results.genres[i].checked = 'true';
+        }
+      }
+
+      res.render('book_form', {title: 'Create Book', authors: results.authors
+        , genres: results.genres, book: book, errors: errors});
+    });
+  } else {
+    // Save the data
+    book.save(function(err) {
+      if (err) {
+        return next(err);
+      }
+      res.redirect(book.url_list);
+    });
+  }
 };
 
 // Display book delete form on GET

@@ -21,6 +21,13 @@ BookInstanceSchema
     return '/catalog/bookinstance/' + this._id;
   });
 
+// Virtual book url
+BookInstanceSchema
+  .virtual('url_list')
+  .get(function () {
+    return '/catalog/bookinstances';
+  });
+
 // Virtual formatted Date
 BookInstanceSchema
   .virtual('due_back_formatted')

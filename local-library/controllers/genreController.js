@@ -84,7 +84,7 @@ exports.genre_create_post = function(req, res, next) {
               return next(err);
             }
             // res.redirect(genre.url);
-            res.redirect(genre.list_url);
+            res.redirect(genre.url_list);
           });
         }
       });
@@ -93,12 +93,55 @@ exports.genre_create_post = function(req, res, next) {
 
 // Display Genre delete form on GET
 exports.genre_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Genre delete GET');
+  async.parallel({
+    genre: function(callback) {
+      Genre.findById(req.params.id).exec(callback);
+    },
+    genres_books: function(callback) {
+      Book.find({'genre': req.params.id}).exec(callback);
+    },
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.render('genre_delete', {title: 'Delete Genre', genre: results.genre
+      , genre_books: results.genres_books});
+  });
 };
 
 // Handle Genre delete on POST
 exports.genre_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Genre delete POST');
+  req.checkBody('genre_id', 'Genre id must exists.').notEmpty();
+
+  async.parallel({
+    genre: function(callback) {
+      Genre.findById(req.params.author_id).exec(callback);
+    },
+    genres_books: function(callback) {
+      Book.find({'genre': req.params.genre_id}, 'title summary').exec(callback);
+    },
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    // Success
+    if (results.genres_books.length > 0) {
+      // Genre has book(s), render in same way as in GET route.
+      res.render('genre_delete', {title: 'Delete Genre', genre: results.genre
+        , author_books: results.genres_books});
+      return;
+    } else {
+      // Genre has no book(s), Delete object and return to author list page.
+      Genre.findByIdAndRemove(req.body.genre_id, function deleteGenre(err) {
+        if (err) {
+          return next(err);
+        }
+        // res.redirect('/catalog/genres');
+        var genre = new Genre();
+        res.redirect(genre.url_list);
+      });
+    }
+  });
 };
 
 // Display Genre update form on GET

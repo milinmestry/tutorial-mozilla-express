@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  h1 #{title}: #{genre.name}
+  hr
+
+  if genre_books.length
+    p.text-danger #[strong Delete the following book(s) before attempting to delete genre.]
+    
+    div.row
+      h3 Books
+      
+      dl
+        each book in genre_books
+          dt
+            a(href=book.url) #{book.title}
+          dd #{book.summary}
+
+  else
+    p Do you really want to delete this genre?
+    
+    form(method='POST', action='')
+      div.form-group
+        input#genre_id.form-control(type='hidden', name='genre_id'
+          , required='true', value=genre._id)
+          
+      button.btn.btn-warning(type='submit') Delete

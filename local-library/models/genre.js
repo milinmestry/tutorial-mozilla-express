@@ -1,11 +1,10 @@
 var mongoose = require('mongoose');
+
 var Schema = mongoose.Schema;
-var GenreSchema = Schema(
-  {
-    name: {type: String, required: true, min:3, max: 100},
-    description: {type: String, max: 500},
-  }
-);
+var GenreSchema = Schema({
+  name: {type: String, required: true, min:3, max: 100},
+  description: {type: String, max: 500},
+});
 
 
 // Virtual for Genre URL
@@ -17,7 +16,7 @@ GenreSchema
 
 // Virtual for Genre List
 GenreSchema
-  .virtual('list_url')
+  .virtual('url_list')
   .get(function () {
     return '/catalog/genres';
   });

@@ -130,7 +130,7 @@ exports.author_delete_post = function(req, res, next) {
         }
         var author = new Author();
         res.redirect(author.url_list);
-      })
+      });
     }
   });
 };

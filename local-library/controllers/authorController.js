@@ -97,7 +97,7 @@ exports.author_delete_get = function(req, res, next) {
       return next(err);
     }
     res.render('author_delete', {title: 'Delete Author', author: results.author
-      , authors_books: results.authors_books});
+      , author_books: results.authors_books});
   });
 };
 
@@ -120,7 +120,7 @@ exports.author_delete_post = function(req, res, next) {
     if (results.authors_books.length > 0) {
       // Author has book(s), render in same way as in GET route.
       res.render('author_delete', {title: 'Delete Author', author: results.author
-        , authors_books: results.author_books});
+        , author_books: results.author_books});
       return;
     } else {
       // Author has no book(s), Delete object and return to author list page.
@@ -128,6 +128,7 @@ exports.author_delete_post = function(req, res, next) {
         if (err) {
           return next(err);
         }
+        var author = new Author();
         res.redirect(author.url_list);
       })
     }

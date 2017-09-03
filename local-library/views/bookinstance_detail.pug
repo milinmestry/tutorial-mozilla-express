@@ -3,6 +3,9 @@ extends layout
 block content
   
   h1 ID: #{bookinstance._id}
+  hr
+  p 
+    a.btn.btn-danger(href=bookinstance.url + '/delete') Delete BookInstance
   
   p #[strong Title: ]
     a(href=bookinstance.book.url) #{bookinstance.book.title}

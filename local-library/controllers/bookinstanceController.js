@@ -1,6 +1,9 @@
 var BookInstance = require('../models/bookinstance');
 var Book = require('../models/book');
 
+var async = require('async');
+
+
 // Display list of all BookInstances
 exports.bookinstance_list = function(req, res) {
   BookInstance.find()
@@ -87,21 +90,46 @@ exports.bookinstance_create_post = function(req, res, next) {
 };
 
 // Display BookInstance delete form on GET
-exports.bookinstance_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance delete GET');
+exports.bookinstance_delete_get = function(req, res, next) {
+  async.parallel({
+    bookinstance: function(callback) {
+      BookInstance.findById(req.params.id).populate('book').exec(callback);
+    },
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
+    res.render('bookinstance_delete', {title: 'Delete BookInstance'
+      , bookinstance: results.bookinstance});
+  });
 };
 
 // Handle BookInstance delete on POST
-exports.bookinstance_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance delete POST');
+exports.bookinstance_delete_post = function(req, res, next) {
+  req.checkBody('bookinstance_id', 'BookInstance id must exists.').notEmpty();
+
+  var errors = req.validationErrors();
+  if (errors) {
+    var bookinstance = new BookInstance();
+    res.redirect(bookinstance.url_list);
+  }
+
+  // BookInstance has no book(s), Delete object and return to author list page.
+  BookInstance.findByIdAndRemove(req.body.bookinstance_id, function deleteBookInstance(err) {
+    if (err) {
+      return next(err);
+    }
+    var bookinstance = new BookInstance();
+    res.redirect(bookinstance.url_list);
+  });
 };
 
-// Display BookInstance update form on GET
+// Display BookInstance update form on, next GET
 exports.bookinstance_update_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: BookInstance update GET');
+  res.send('NOT IMPLEMENTED: bookinstance update GET');
 };
 
-// Handle bookinstance update on POST
+// Handle BookInstanceokinstance update on POST
 exports.bookinstance_update_post = function(req, res) {
   res.send('NOT IMPLEMENTED: BookInstance update POST');
 };

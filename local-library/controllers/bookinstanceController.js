@@ -19,6 +19,12 @@ exports.bookinstance_list = function(req, res) {
 
 // Display detail page for a specific BookInstance
 exports.bookinstance_detail = function(req, res, next) {
+  var errors = [];
+  if (req.query.message === 'noidel') {
+    errors.push('Missing information on delete page.');
+  }
+  console.log('error: ' + errors);
+
   BookInstance.findById(req.params.id)
     .populate('book')
     .exec(function(err, bookinstance){
@@ -26,7 +32,8 @@ exports.bookinstance_detail = function(req, res, next) {
         return next(err);
       }
       // Render template
-      res.render('bookinstance_detail', {title: 'Book Instance', bookinstance: bookinstance});
+      res.render('bookinstance_detail', {title: 'Book Instance'
+        , bookinstance: bookinstance, errors: errors});
     });
 };
 
@@ -108,10 +115,14 @@ exports.bookinstance_delete_get = function(req, res, next) {
 exports.bookinstance_delete_post = function(req, res, next) {
   req.checkBody('bookinstance_id', 'BookInstance id must exists.').notEmpty();
 
-  var errors = req.validationErrors();
+  var errors = req.getValidationResult();
+
   if (errors) {
-    var bookinstance = new BookInstance();
-    res.redirect(bookinstance.url_list);
+    var bookinstance = new BookInstance({
+      _id: req.params.id,
+    });
+    // Redirect to detail page
+    res.redirect(bookinstance.url + '?message=noidel');
   }
 
   // BookInstance has no book(s), Delete object and return to author list page.

@@ -1,11 +1,10 @@
 extends layout
 
 block content
-  
-  if errors.count
-    ul
-    each error in errors
-      li #{error}
+  if errors.length
+    ul.bg-danger
+      each error in errors
+        li.text-danger #{error}
   
   h1 ID: #{bookinstance._id}
   hr

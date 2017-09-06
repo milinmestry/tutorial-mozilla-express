@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1 Delete Book
+
+  p Do you really want to delete #[strong #[a(href=book.url) #{book.title}]]&quest;
+
+  form(method='POST', action='')
+    div.form-group
+      input#book_id.form-control(type='hidden', name='book_id'
+        , required='true', value=book._id)
+        
+    button.btn.btn-danger(type='submit') Delete Book

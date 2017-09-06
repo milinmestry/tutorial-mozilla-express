@@ -44,6 +44,11 @@ exports.book_list = function(req, res, next) {
 
 // Display detail page for a specific book
 exports.book_detail = function(req, res, next) {
+  var errors = [];
+  if (req.query.message === 'noidel') {
+    errors.push('Missing information on delete page, please try again.');
+  }
+
   async.parallel({
     book: function(callback) {
       Book.findById(req.params.id)
@@ -62,7 +67,7 @@ exports.book_detail = function(req, res, next) {
     }
     // Success, render template
     res.render('book_detail', {title: 'Book Detail'
-      , book: results.book, book_instances: results.book_instance});
+      , book: results.book, book_instances: results.book_instance, errors: errors});
   });
 };
 
@@ -148,13 +153,40 @@ exports.book_create_post = function(req, res, next) {
 };
 
 // Display book delete form on GET
-exports.book_delete_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book delete GET');
+exports.book_delete_get = function(req, res, next) {
+  Book.findById(req.params.id, 'title')
+    .exec(function(err, book) {
+      if (err) {
+        return next(err);
+      }
+      // Success
+      res.render('book_delete', {title: 'Delete Book', book: book});
+    });
 };
 
 // Handle book delete on POST
 exports.book_delete_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Book delete POST');
+  req.checkBody('book_id', 'Book id must exists.').notEmpty();
+
+  var errors = req.validationErrors();
+  // console.log(' ERROR : ' + errors);
+  if (errors) {
+    var book = new Book({
+      _id: req.params.id,
+    });
+    // Redirect to detail page
+    res.redirect(book.url + '?message=noidel');
+    return;
+  }
+
+  // Book has no book copy/copies, Delete object and return to book list page.
+  Book.findByIdAndRemove(req.body.book_id, function deleteBook(err) {
+    if (err) {
+      return next(err);
+    }
+    var book = new Book();
+    res.redirect(book.url_list);
+  });
 };
 
 // Display book update form on GET

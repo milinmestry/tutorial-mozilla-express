@@ -1,35 +1,48 @@
 extends layout
 
 block content
-  
+  if errors.length
+    ul.bg-danger
+      each error in errors
+        li.text-danger #{error}
+        
   h1 Book Title: #{book.title}
+  
+  p
+  if book_instances.length
+    button.btn.btn-danger(disabled='disabled') Delete Book
+    span.text-info    Book copies exists, hence button is disabled.
+  else
+    a.btn.btn-danger(href=book.url + '/delete') Delete Book
+
+  hr
   
   p #[strong Author: ]
     a(href=book.author.url) #{book.author.name}
   p #[strong Summary:] #{book.summary}
   p #[strong ISBN:] #{book.isbn}
   p #[strong Genre:]&nbsp;
-    each val in book.genre
+    each val, index in book.genre
       a(href=val.url) #{val.name}
-      | ,
-      
+      | #{(index !== 0) ? '' : ', '}
+        
   div(style='margin-left:20px; margin-top:20px;')
     
     h4 Copies
     
-      each val in book_instances
-        hr
-        if val.status == 'Available'
-          p.text-success #{val.status}
-        else if val.status == 'Maintenance'    
-          p.text-danger #{val.status}
-        else
-          p.text-warning #{val.status}
-        p #[strong Imprint:] #{val.imprint}
-        if val.status != 'Available'
-          p #[strong Due back:] #{val.due_back_formatted}
-        p #[strong Id:]&nbsp;
-          a(href=val.url) #{val._id}
-          
+    each val in book_instances
+      hr
+      if val.status == 'Available'
+        p.text-success #{val.status}
+      else if val.status == 'Maintenance'    
+        p.text-danger #{val.status}
       else
-        p There are no copies of book in this library.
+        p.text-warning #{val.status}
+      p #[strong Imprint:] #{val.imprint}
+      if val.status != 'Available'
+        p #[strong Due back:] #{val.due_back_formatted}
+      p #[strong Id:]&nbsp;
+        a(href=val.url) #{val._id}
+        
+    else
+      p There are no copies of book in this library.

@@ -12,7 +12,7 @@ block content
     div.form-group
       label(for='book') Book:
       select#book.form-control(type='select', placeholder='Select Book' name='book' required='true')
-        option(value='') Select Book
+        option(value='') --Select Book--
         for book in book_list
           if bookinstance
             option(value=book._id selected=(book._id.toString() == bookinstance.book.toString() ? 'selected' : false)) #{book.title}
@@ -27,16 +27,18 @@ block content
     div.form-group
       label(for='due_back') Date when book available:
       input#due_back.form-control(type='text', placeholder='Due date'
-        name='due_back' value=(undefined === bookinstance ? '' : bookinstance.due_back))
+        name='due_back' value=(undefined === bookinstance ? '' : bookinstance.due_back_formatted_form))
         
     div.form-group
       label(for='status') Status:
       select#status.form-control(type='select' placeholder='Select Status' name='status' required='true')
-        option(value='') Select Status
-        option(value='Available') Available
-        option(value='Maintenance') Maintenance
-        option(value='Loaned') Loaned
-        option(value='Reserved') Reserved
+        option(value='') --Select Status--
+        for status in  book_statuses
+          option(value=status selected=(status == bookinstance.status ? 'selected' : false)) #{status}
+        //- option(value='Available') Available
+        //- option(value='Maintenance') Maintenance
+        //- option(value='Loaned') Loaned
+        //- option(value='Reserved') Reserved
     
     div.form-group
       button.btn.btn-primary(type='submit') Submit

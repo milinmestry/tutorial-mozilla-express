@@ -18,6 +18,7 @@ exports.genre_list = function(req, res, next) {
 
 // Display detail page for a specific Genre
 exports.genre_detail = function(req, res, next) {
+  var errors = [];
   async.parallel(
     {
       genre: function(callback) {
@@ -32,8 +33,8 @@ exports.genre_detail = function(req, res, next) {
       }
       // Success, render template
       res.render('genre_detail', {
-        title: 'Genre Details', genre: results.genre
-        , genre_books: results.genre_books
+        title: 'Genre Details', genre: results.genre,
+        genre_books: results.genre_books, errors: errors
       });
     }
   );
@@ -145,11 +146,47 @@ exports.genre_delete_post = function(req, res, next) {
 };
 
 // Display Genre update form on GET
-exports.genre_update_get = function(req, res) {
-  res.send('NOT IMPLEMENTED: Genre update GET');
+exports.genre_update_get = function(req, res, next) {
+  req.sanitize('id').escape().trim();
+
+  Genre.findById(req.params.id).exec(function (err, genre) {
+    if (err) {
+      return next(err);
+    }
+    res.render('genre_form', { title: 'Update Genre', genre: genre });
+  });
 };
 
 // Handle Genre update on POST
-exports.genre_update_post = function(req, res) {
-  res.send('NOT IMPLEMENTED: Genre update POST');
+exports.genre_update_post = function(req, res, next) {
+  req.sanitize('id').escape().trim();
+
+  req.checkBody('name', 'Genre name required.').notEmpty();
+  // TODO: Validate already exists genre name 
+
+  // Trim and escape the name field
+  req.sanitize('name').escape().trim();
+
+  var errors = req.validationErrors();
+
+  // Create a Genre object
+  var genre = new Genre({
+    _id: req.params.id,
+    name: req.body.name
+  });
+
+  // If errors display the form again, passing previously entered values and errors.
+  if (errors) {
+    res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
+    return;
+  } else {
+    // Save the new Genre name
+    Genre.findByIdAndUpdate(req.params.id, genre, {}, function(err, theGenre) {
+      if (err) {
+        return next(err);
+      }
+      res.redirect(theGenre.url);
+    });
+  }
+
 };

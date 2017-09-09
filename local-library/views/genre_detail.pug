@@ -1,11 +1,18 @@
 extends layout
 
 block content
+  if errors.length
+    ul.bg-danger
+      each error in errors
+        li.text-danger #{error}
+
   h1 Genre: #{genre.name}
-  hr
+  p
+    a.btn.btn-default(href=genre.url + '/update') Update Genre
   p
     a.btn.btn-danger(href=genre.url + '/delete') Delete Genre
-    
+
+  hr    
   div(style='margin-left:20px; margin-top:20px;')
     
     h4 Books

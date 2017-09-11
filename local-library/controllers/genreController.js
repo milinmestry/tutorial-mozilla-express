@@ -162,7 +162,7 @@ exports.genre_update_post = function(req, res, next) {
   req.sanitize('id').escape().trim();
 
   req.checkBody('name', 'Genre name required.').notEmpty();
-  // TODO: Validate already exists genre name 
+  // TODO: Validate already exists genre name
 
   // Trim and escape the name field
   req.sanitize('name').escape().trim();

@@ -6,6 +6,23 @@ var GenreSchema = Schema({
   description: {type: String, max: 500},
 });
 
+// Validate Unique Genre
+// GenreSchema.path('name').validate(function(v, fn) {
+//   console.log('value=' + v);
+//   // Make sure the Genre is not already exists
+//   var GenreModel = mongoose.model('Genre');
+//   GenreModel.findOne({'name': v.toLowerCase()}, function (err, genres) {
+//     fn(err || genres.length === 0);
+//   });
+// }, 'Genre is already exists.');
+
+GenreSchema.path('name').validate(function (value, done) {
+  console.log('unique value=' + value);
+  Genre.count({ name: value.toLowerCase() }, function (error, count) {
+    // Return false if an error is thrown or count > 0
+    done(!(error || count));
+  });
+}, 'unique');
 
 // Virtual for Genre URL
 GenreSchema

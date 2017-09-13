@@ -168,7 +168,7 @@ exports.genre_update_post = function(req, res, next) {
   req.sanitize('name').escape().trim();
 
   var errors = req.validationErrors();
-
+// console.log('#171 ' + JSON.stringify(errors));
   // Create a Genre object
   var genre = new Genre({
     _id: req.params.id,
@@ -181,9 +181,17 @@ exports.genre_update_post = function(req, res, next) {
     return;
   } else {
     // Save the new Genre name
-    Genre.findByIdAndUpdate(req.params.id, genre, {}, function(err, theGenre) {
+    Genre.findByIdAndUpdate(req.params.id, genre, {runValidators: true}, function(err, theGenre) {
       if (err) {
-        return next(err);
+        console.log('#186 Genre update error= ' + err.errors.name);
+        console.log('#186 Genre update error= ' + err.errors.name.message);
+        if (err.errors.name != '') {
+          errors = [{msg: err.errors.name}];
+          res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
+          return;
+        } else {
+          return next(err);
+        }
       }
       res.redirect(theGenre.url);
     });

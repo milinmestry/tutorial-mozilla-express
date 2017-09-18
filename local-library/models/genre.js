@@ -20,31 +20,23 @@ GenreSchema
     return '/catalog/genres';
   });
 
-
-
-// Validate Unique Genre
-// GenreSchema.path('name').validate(function(v, fn) {
-//   console.log('value=' + v);
-//   // Make sure the Genre is not already exists
+// http://mongoosejs.com/docs/validation.html#built-in-validators
+// http://mongoosejs.com/docs/api.html#model_Model.findOneAndUpdate
+// GenreSchema.path('name').validate(function (value, done) {
 //   var GenreModel = mongoose.model('Genre');
-//   GenreModel.findOne({'name': v.toLowerCase()}, function (err, genres) {
-//     fn(err || genres.length === 0);
+//
+//   GenreModel.count({ name: new RegExp(value, 'i') }, function (error, count) {
+//     // Return false if an error is thrown or count > 0
+//     done(!(error || count));
 //   });
 // }, 'Genre is already exists.');
 
-// http://mongoosejs.com/docs/validation.html#built-in-validators
-// http://mongoosejs.com/docs/api.html#model_Model.findOneAndUpdate
-GenreSchema.path('name').validate(function (value, done) {
-  console.log('{[GenreModel]} unique value = ' + value);
-  var GenreModel = mongoose.model('Genre');
-  console.log('{[GenreModel]} id = ' + this.id);
-  GenreModel.count({ name: new RegExp(value, 'i') }, function (error, count) {
-    console.log('{[GenreModel]} error = ' + error);
-    console.log('{[GenreModel]} count = ' + count);
-    // Return false if an error is thrown or count > 0
-    done(!(error || count));
-  });
-}, 'Genre is already exists.');
+GenreSchema.query.isGenreExists = function (name, id) {
+  if (id !== undefined) {
+    return this.count({ name: new RegExp(name, 'i'), _id: {$ne: id} });
+  }
+  return this.count({ name: new RegExp(name, 'i') });
+};
 
 // export model
 module.exports = mongoose.model('Genre', GenreSchema);

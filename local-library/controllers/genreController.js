@@ -159,42 +159,41 @@ exports.genre_update_get = function(req, res, next) {
 
 // Handle Genre update on POST
 exports.genre_update_post = function(req, res, next) {
-  req.sanitize('id').escape().trim();
+  async.parallel({
+    genreFound: function(callback) {
+      Genre.find().isGenreExists(req.body.name, req.params.id).exec(callback);
+    },
+  }, function(err, results) {
+    if (err) {
+      return next(err);
+    }
 
-  req.checkBody('name', 'Genre name required.').notEmpty();
-  // TODO: Validate already exists genre name
+    req.sanitize('id').escape().trim();
+    req.checkBody('name', 'Genre name required.').notEmpty();
+    req.sanitize('name').escape().trim();
 
-  // Trim and escape the name field
-  req.sanitize('name').escape().trim();
+    var errors = req.validationErrors();
 
-  var errors = req.validationErrors();
-// console.log('#171 ' + JSON.stringify(errors));
-  // Create a Genre object
-  var genre = new Genre({
-    _id: req.params.id,
-    name: req.body.name
-  });
+    if (results.genreFound > 0) {
+      errors = [{msg: 'Genre already exists!'}];
+    }
 
-  // If errors display the form again, passing previously entered values and errors.
-  if (errors) {
-    res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
-    return;
-  } else {
-    // Save the new Genre name
-    Genre.findByIdAndUpdate(req.params.id, genre, {runValidators: true}, function(err, theGenre) {
-      if (err) {
-        console.log('#186 Genre update error= ' + err.errors.name);
-        console.log('#186 Genre update error= ' + err.errors.name.message);
-        if (err.errors.name != '') {
-          errors = [{msg: err.errors.name}];
-          res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
-          return;
-        } else {
+    var genre = new Genre({
+      _id: req.params.id,
+      name: req.body.name
+    });
+// console.log('#234 ' + JSON.stringify(errors));
+    if (errors) {
+      res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
+      return;
+    } else {
+      // Save the new Genre name
+      Genre.findByIdAndUpdate(req.params.id, genre, {}, function(err, theGenre) {
+        if (err) {
           return next(err);
         }
-      }
-      res.redirect(theGenre.url);
-    });
-  }
-
+        res.redirect(theGenre.url);
+      });
+    }
+  });
 };

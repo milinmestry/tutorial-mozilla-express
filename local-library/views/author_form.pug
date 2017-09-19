@@ -22,11 +22,11 @@ block content
     div.form-group
       label(for='date_of_birth') Date of Birth:
       input#date_of_birth.form-control(type='date', name='date_of_birth' placeholder="mm/dd/yyyy"
-        , value=(undefined === author ? '' : author.date_of_birth))
+        , value=(undefined === author ? '' : author.dob_formatted_form))
     
     div.form-group
       label(for='date_of_death') Date of Death:
       input#date_of_death.form-control(type='date', name='date_of_death' placeholder="mm/dd/yyyy"
-        , value=(undefined === author ? '' : author.date_of_death))
+        , value=(undefined === author ? '' : author.dod_formatted_form))
     
     button.btn.btn-primary(type='submit') Submit

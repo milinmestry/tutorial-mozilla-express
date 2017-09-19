@@ -65,5 +65,19 @@ AuthorSchema
     }
   });
 
+// Virtual formatted Date of birth for web form
+AuthorSchema
+  .virtual('dob_formatted_form')
+  .get(function () {
+    return moment(this.date_of_birth).format('YYYY-MM-DD');
+  });
+
+// Virtual formatted Date of death for web form
+AuthorSchema
+  .virtual('dod_formatted_form')
+  .get(function () {
+    return moment(this.date_of_death).format('YYYY-MM-DD');
+  });
+
 // export model
 module.exports = mongoose.model('Author', AuthorSchema);

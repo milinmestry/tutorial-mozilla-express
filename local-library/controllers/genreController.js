@@ -163,6 +163,7 @@ exports.genre_update_post = function(req, res, next) {
     genreFound: function(callback) {
       // No name is provided, just return -1
       if (req.body.name === '') {
+        // https://stackoverflow.com/questions/20186081/understanding-node-js-async-parallel
         callback(null, -1);
       } else {
         Genre.find().isGenreExists(req.body.name, req.params.id).exec(callback);

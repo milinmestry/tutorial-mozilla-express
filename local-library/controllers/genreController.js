@@ -161,7 +161,12 @@ exports.genre_update_get = function(req, res, next) {
 exports.genre_update_post = function(req, res, next) {
   async.parallel({
     genreFound: function(callback) {
-      Genre.find().isGenreExists(req.body.name, req.params.id).exec(callback);
+      // No name is provided, just return -1
+      if (req.body.name === '') {
+        callback(null, -1);
+      } else {
+        Genre.find().isGenreExists(req.body.name, req.params.id).exec(callback);
+      }
     },
   }, function(err, results) {
     if (err) {

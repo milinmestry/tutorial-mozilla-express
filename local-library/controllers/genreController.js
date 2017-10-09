@@ -158,7 +158,7 @@ exports.genre_update_get = function(req, res, next) {
 };
 
 // Handle Genre update on POST
-exports.genre_update_post = function(req, res, next) {
+exports.genre_update_post_ORG = function(req, res, next) {
   async.parallel({
     genreFound: function(callback) {
       // No name is provided, just return -1
@@ -201,5 +201,34 @@ exports.genre_update_post = function(req, res, next) {
         res.redirect(theGenre.url);
       });
     }
+  });
+};
+
+// https://github.com/ctavan/express-validator/issues/413
+exports.genre_update_post = function(req, res, next) {
+  req.sanitize('id').escape().trim();
+  req.checkBody('name', 'Genre name required.')
+    .notEmpty()
+    .genreNotExists(req.params.id).withMessage('Genre already eists.');
+  req.sanitize('name').escape().trim();
+
+  var genre = new Genre({
+    _id: req.params.id,
+    name: req.body.name
+  });
+
+  req.getValidationResult().then(() => {
+    // Validation passed
+    // Save the new Genre name
+    Genre.findByIdAndUpdate(req.params.id, genre, {}, function(err, theGenre) {
+      if (err) {
+        return next(err);
+      }
+      res.redirect(theGenre.url);
+    });
+  }, errors => {
+    // Validation failed;
+    res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
+    return;
   });
 };

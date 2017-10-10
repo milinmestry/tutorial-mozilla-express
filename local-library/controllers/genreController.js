@@ -158,7 +158,7 @@ exports.genre_update_get = function(req, res, next) {
 };
 
 // Handle Genre update on POST
-exports.genre_update_post = function(req, res, next) {
+exports.genre_update_post_ORG = function(req, res, next) {
   async.parallel({
     genreFound: function(callback) {
       // No name is provided, just return -1
@@ -202,4 +202,37 @@ exports.genre_update_post = function(req, res, next) {
       });
     }
   });
+};
+
+exports.genre_update_post = function(req, res, next) {
+  req.sanitize('id').escape().trim();
+  req.checkBody('name', 'Genre name required.').notEmpty(),
+  req.checkBody('name', 'Genre already exists!')
+    .exists()
+    .custom((value) => {
+      // console.log('#212 value=' + value);
+      // console.log('#213 id=' + req.params.id);
+      return Genre.find().isGenreExists(value, req.params.id).exec();
+    });
+  req.sanitize('name').escape().trim();
+
+  var errors = req.validationErrors();
+
+  var genre = new Genre({
+    _id: req.params.id,
+    name: req.body.name
+  });
+
+  if (errors) {
+    res.render('genre_form', {title: 'Update Genre', genre: genre, errors: errors});
+    return;
+  } else {
+    // Save the new Genre name
+    Genre.findByIdAndUpdate(req.params.id, genre, {}, function(err, theGenre) {
+      if (err) {
+        return next(err);
+      }
+      res.redirect(theGenre.url);
+    });
+  }
 };

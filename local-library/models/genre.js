@@ -32,9 +32,11 @@ GenreSchema
 // }, 'Genre is already exists.');
 
 GenreSchema.query.isGenreExists = function (name, id) {
+  console.log('isGenreExists:: name=' + name + ' , id=' + id);
   if (id !== undefined) {
-    return this.count({ name: new RegExp(name, 'i'), _id: {$ne: id} });
+    return this.count({ name: new RegExp(name, 'i'), _id: { $ne: id } });
   }
+
   return this.count({ name: new RegExp(name, 'i') });
 };
 
